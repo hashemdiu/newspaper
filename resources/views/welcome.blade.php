@@ -1,95 +1,178 @@
-<!doctype html>
-<html lang="{{ app()->getLocale() }}">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+@extends('layouts.mainlayout')
 
-        <title>Laravel</title>
+@section('main')
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="widget">
+                    <div class="widget-heading">
+                        <h3 class="widget-title">All Posts</h3>
+                    </div>
+                    <div class="widget-body">
+                        <div id="example-1_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                            <form method="post" action="{{ route('delete-selected-post') }}">
+                                {{ csrf_field() }}
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <input type="submit" value="Delete Selected" class="btn btn-danger" name="submit">
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="dataTables_length" id="example-1_length">
+                                        <label>Show
+                                            <select name="example-1_length" aria-controls="example-1" class="form-control input-sm">
+                                                <option value="10">10</option>
+                                                <option value="25">25</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                            </select> entries
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div id="example-1_filter" class="dataTables_filter"><label>Search:<input
+                                                    type="search" class="form-control input-sm" placeholder=""
+                                                    aria-controls="example-1"></label></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="example-1" cellspacing="0" width="100%"
+                                           class="table table-striped table-bordered dataTable" role="grid"
+                                           aria-describedby="example-1_info" style="width: 100%;">
+                                        <thead>
+                                        <tr role="row">
+                                            <th class="sorting" tabindex="0" aria-controls="example-1" rowspan="1"
+                                                colspan="1" aria-label="Position: activate to sort column ascending"
+                                                style="width: 299px;">Select
+                                            </th>
+                                            <th class="sorting_asc" tabindex="0" aria-controls="example-1" rowspan="1"
+                                                colspan="1" aria-sort="ascending"
+                                                aria-label="Name: activate to sort column descending"
+                                                style="width: 183px;">Photo
+                                            </th>
+                                            <th class="sorting" tabindex="0" aria-controls="example-1" rowspan="1"
+                                                colspan="1" aria-label="Position: activate to sort column ascending"
+                                                style="width: 299px;">Title
+                                            </th>
+                                            <th class="sorting" tabindex="0" aria-controls="example-1" rowspan="1"
+                                                colspan="1" aria-label="Position: activate to sort column ascending"
+                                                style="width: 299px;">Add To Slide
+                                            </th>
+                                            <th class="sorting" tabindex="0" aria-controls="example-1" rowspan="1"
+                                                colspan="1" aria-label="Position: activate to sort column ascending"
+                                                style="width: 299px;">Top Post
+                                            </th>
+                                            <th class="sorting" tabindex="0" aria-controls="example-1" rowspan="1"
+                                                colspan="1" aria-label="Office: activate to sort column ascending"
+                                                style="width: 135px;">Category
+                                            </th>
+                                            <th class="sorting" tabindex="0" aria-controls="example-1" rowspan="1"
+                                                colspan="1" aria-label="Office: activate to sort column ascending"
+                                                style="width: 135px;">Action
+                                            </th>
 
-        <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
+                                        </tr>
+                                        </thead>
+                                        <tfoot>
+                                        <tr>
+                                            <th rowspan="1" colspan="1">Select</th>
+                                            <th rowspan="1" colspan="1">Photo</th>
+                                            <th rowspan="1" colspan="1">Title</th>
+                                            <th rowspan="1" colspan="1">Add To Slide</th>
+                                            <th rowspan="1" colspan="1">Top Post</th>
+                                            <th rowspan="1" colspan="1">Category</th>
+                                            <th rowspan="1" colspan="1">Action</th>
+                                        </tr>
+                                        </tfoot>
+                                        <tbody>
+                                        @foreach($allPost as $post)
 
-        <!-- Styles -->
-        <style>
-            html, body {
-                background-color: #fff;
-                color: #636b6f;
-                font-family: 'Raleway', sans-serif;
-                font-weight: 100;
-                height: 100vh;
-                margin: 0;
-            }
+                                            <tr role="row" class="odd">
+                                                <td class="sorting_1"><input name="deleteposts[]" type="checkbox" value="{{ $post->id }}"></td>
+                                                <td class="sorting_1">
 
-            .full-height {
-                height: 100vh;
-            }
+                                                    <?php
+                                                        $img = $post->images->first();
+                                                    ?>
+                                                        <img src="{{ asset($img['image_url']) }}" alt="">
+                                                </td>
 
-            .flex-center {
-                align-items: center;
-                display: flex;
-                justify-content: center;
-            }
-
-            .position-ref {
-                position: relative;
-            }
-
-            .top-right {
-                position: absolute;
-                right: 10px;
-                top: 18px;
-            }
-
-            .content {
-                text-align: center;
-            }
-
-            .title {
-                font-size: 84px;
-            }
-
-            .links > a {
-                color: #636b6f;
-                padding: 0 25px;
-                font-size: 12px;
-                font-weight: 600;
-                letter-spacing: .1rem;
-                text-decoration: none;
-                text-transform: uppercase;
-            }
-
-            .m-b-md {
-                margin-bottom: 30px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="flex-center position-ref full-height">
-            @if (Route::has('login'))
-                <div class="top-right links">
-                    @if (Auth::check())
-                        <a href="{{ url('/home') }}">Home</a>
-                    @else
-                        <a href="{{ url('/login') }}">Login</a>
-                        <a href="{{ url('/register') }}">Register</a>
-                    @endif
+                                                <td><a href="{{ route('single-post',['id'=>$post->id]) }}">{{ $post->title }} </a></td>
+                                                <td><a href="{{ $post->sliders?route('remove-from-slide',['id' => $post->id]):route('add-to-slide',['id' => $post->id]) }}" class="btn btn-xs btn-danger">{{ $post->sliders?'Remove From Slide':'Add To Slide' }}</a></td>
+                                                <td><a href="{{ $post->topPosts?route('remove-top-post',['id' => $post->id]):route('add-top-post',['id' => $post->id]) }}" class="btn btn-xs btn-danger">{{ $post->topPosts?'Remove Top Post':'Add To Top Post' }}</a></td>
+                                                <td>
+                                                    @foreach($post->categories as $category)
+                                                        <span class="label label-success">{{ $category->category_name }}</span>
+                                                    @endforeach
+                                                </td>
+                                                <td>
+                                                    <a href="{{ route('edit-post',['id' => $post->id]) }}" class="btn btn-xs btn-danger">Edit</a>
+                                                    <a href="{{ route('delete-post',['id' => $post->id]) }}" class="btn btn-xs btn-danger">Delete</a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            </form>
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="dataTables_info" id="example-1_info" role="status" aria-live="polite">
+                                        Showing 1 to 10 of 57 entries
+                                    </div>
+                                </div>
+                                <div class="col-sm-7">
+                                    <div class="dataTables_paginate paging_simple_numbers" id="example-1_paginate">
+                                        {{ $allPost->links() }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            @endif
+            </div>
+            <div class="col-md-12">
+                <div class="widget">
+                    <div class="widget-heading">
+                        <h3 class="widget-title">{{ $edit_category? 'Edit Categories': 'Add Categories' }}</h3>
+                    </div>
+                    <div class="widget-body">
+                        <form method="post" action="{{ $edit_category?route('edit-category',['id' => $editCategory->id]):route('post-category') }}">
+                            {{ csrf_field() }}
+                            <div class="form-group">
+                                <label for="txtFullName">Category name</label>
+                                <input id="txtFullName" type="text" class="form-control" name="category_name" value="{{ $edit_category?$editCategory->category_name:'' }}">
+                            </div>
 
-            <div class="content">
-                <div class="title m-b-md">
-                    Laravel
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-outline btn-success">Submit</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-
-                <div class="links">
-                    <a href="https://laravel.com/docs">Documentation</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
+                <div class="widget">
+                    <div class="widget-heading">
+                        <h3 class="widget-title">All Categories</h3>
+                    </div>
+                    <div class="widget-body">
+                        <table class="table table-hover">
+                            <tbody>
+                            @foreach($categories as $category)
+                                <tr class="active">
+                                    <th scope="row">{{ $category->id }}</th>
+                                    <td><a href="{{ route('category-post',['id'=>$category->id]) }}">{{ $category->category_name }}</a></td>
+                                    <td>
+                                        <a href="{{ route('delete-category',['id' => $category->id]) }}" class="btn btn-xs btn-warning">Delete</a>
+                                        <a href="{{ route('edit-category',['id' => $category->id]) }}" class="btn btn-xs btn-warning">Edit</a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </body>
-</html>
+    </div>
+@endsection
